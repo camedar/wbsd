@@ -7,13 +7,6 @@
     <p>
         <div style="width:50%;margin-left:auto;margin-right:auto">
                 <div class="form-group">
-                    <label for="txt_username">Username:</label>
-                    <asp:TextBox ID="txt_username" placeholder="Enter username" class="form-control"  aria-describedby="usernameHelp" runat="server"></asp:TextBox>
-                    <small id="usernameHelp" class="form-text text-muted">This is your nickname in te comunity.</small>
-                    <br />
-                    <asp:RequiredFieldValidator ID="vld_username" runat="server" ErrorMessage="User name is required" ControlToValidate="txt_username" ForeColor="Red"></asp:RequiredFieldValidator>
-                </div>
-                <div class="form-group">
                     <label for="txt_firstname">First Name:</label>
                     <asp:TextBox ID="txt_firstname" placeholder="" class="form-control"  aria-describedby="firstnameHelp" runat="server"></asp:TextBox>
                     <asp:RequiredFieldValidator ID="vld_firstname" runat="server" ErrorMessage="First name is required" ControlToValidate="txt_firstname" ForeColor="Red"></asp:RequiredFieldValidator>

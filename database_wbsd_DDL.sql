@@ -1,22 +1,23 @@
-CREATE TABLE [dbo].[people] (
-    [personId] INT IDENTITY (1, 1) NOT NULL,
+CREATE TABLE [dbo].[users] (
+    [userId] INT IDENTITY (1, 1) NOT NULL,
     [firstname] VARCHAR (20) NOT NULL,
     [surname]   VARCHAR (20) NULL,
-    [username]  VARCHAR (15) NOT NULL,
+    [username]  VARCHAR (15) NULL,
     [email]     VARCHAR (25) NOT NULL,
-    [password]  VARCHAR (15) NOT NULL,
-    [status]  INT NOT NULL DEFAULT 1,
-    PRIMARY KEY CLUSTERED ([personId] ASC)
+    [password]  VARCHAR (100) NOT NULL,
+    [confirmationCode]  VARCHAR (16) NOT NULL,
+    [status]  INT NOT NULL DEFAULT 0,
+    PRIMARY KEY CLUSTERED ([userId] ASC)
 );
 
 CREATE TABLE [dbo].[notifications] (
     [notificationId] INT IDENTITY (1, 1) NOT NULL,
-    [fk_people_personId] INT NOT NULL,
+    [fk_users_userId] INT NOT NULL,
     [notificationTitle] VARCHAR (50) NOT NULL,
     [notificationMessage]   VARCHAR (200) NULL,
     [notificationStatus]  INT NOT NULL DEFAULT 1,
     PRIMARY KEY CLUSTERED ([notificationId] ASC),
-    FOREIGN KEY ([fk_people_personId]) REFERENCES people([personId])    
+    FOREIGN KEY ([fk_users_userId]) REFERENCES users([userId])    
 );
 
 CREATE TABLE [dbo].[chats] (
@@ -26,13 +27,13 @@ CREATE TABLE [dbo].[chats] (
     PRIMARY KEY CLUSTERED ([chatId] ASC)   
 );
 
-CREATE TABLE [dbo].[peopleChats] (
-    [peopleChatsId] INT IDENTITY (1, 1) NOT NULL,
-    [fk_people_personId] INT NOT NULL,
+CREATE TABLE [dbo].[usersChats] (
+    [usersChatsId] INT IDENTITY (1, 1) NOT NULL,
+    [fk_users_userId] INT NOT NULL,
     [fk_chats_chatId] INT NOT NULL,
-    [peopleChatsStatus]  INT NOT NULL DEFAULT 1,
-    PRIMARY KEY CLUSTERED ([peopleChatsId] ASC),
-    FOREIGN KEY ([fk_people_personId]) REFERENCES people([personId]),
+    [usersChatsStatus]  INT NOT NULL DEFAULT 1,
+    PRIMARY KEY CLUSTERED ([usersChatsId] ASC),
+    FOREIGN KEY ([fk_users_userId]) REFERENCES users([userId]),
     FOREIGN KEY ([fk_chats_chatId]) REFERENCES chats([chatId])
 );
 
@@ -40,10 +41,10 @@ CREATE TABLE [dbo].[messages] (
     [messageId] INT IDENTITY (1, 1) NOT NULL,
     [messageText] VARCHAR(256) NOT NULL,
     [fk_chats_chatId] INT NOT NULL,
-    [fk_people_personId] INT NOT NULL,
+    [fk_users_userId] INT NOT NULL,
     [messageStatus]  INT NOT NULL DEFAULT 1,
     PRIMARY KEY CLUSTERED ([messageId] ASC),
-    FOREIGN KEY ([fk_people_personId]) REFERENCES people([personId]),
+    FOREIGN KEY ([fk_users_userId]) REFERENCES users([userId]),
     FOREIGN KEY ([fk_chats_chatId]) REFERENCES chats([chatId])
 );
 
@@ -57,13 +58,13 @@ CREATE TABLE [dbo].[projects] (
     PRIMARY KEY CLUSTERED ([projectId] ASC)
 );
 
-CREATE TABLE [dbo].[peopleProjects] (
-    [peopleProjectsId] INT IDENTITY (1, 1) NOT NULL,
+CREATE TABLE [dbo].[usersProjects] (
+    [usersProjectsId] INT IDENTITY (1, 1) NOT NULL,
     [fk_projects_projectId] INT NOT NULL,
-    [fk_people_personId] INT NOT NULL,
-    [peopleProjectsStatus]  INT NOT NULL DEFAULT 0,
-    PRIMARY KEY CLUSTERED ([peopleProjectsId] ASC),
-    FOREIGN KEY ([fk_people_personId]) REFERENCES people([personId]),
+    [fk_users_userId] INT NOT NULL,
+    [usersProjectsStatus]  INT NOT NULL DEFAULT 0,
+    PRIMARY KEY CLUSTERED ([usersProjectsId] ASC),
+    FOREIGN KEY ([fk_users_userId]) REFERENCES users([userId]),
     FOREIGN KEY ([fk_projects_projectId]) REFERENCES projects([projectId])
 );
 
@@ -91,12 +92,12 @@ CREATE TABLE [dbo].[shares] (
     [shareId] INT IDENTITY (1, 1) NOT NULL,
     [shareTitle] VARCHAR(50) NOT NULL,
     [shareText] VARCHAR(256) NOT NULL,
-    [fk_people_personId] INT NOT NULL,
+    [fk_users_userId] INT NOT NULL,
     [fk_projects_projectId] INT NOT NULL,
     [fk_topics_topicId] INT NOT NULL,
     [shareStatus]  INT NOT NULL DEFAULT 1,
     PRIMARY KEY CLUSTERED ([shareId] ASC),
-    FOREIGN KEY ([fk_people_personId]) REFERENCES people([personId]),
+    FOREIGN KEY ([fk_users_userId]) REFERENCES users([userId]),
     FOREIGN KEY ([fk_projects_projectId]) REFERENCES projects([projectId]),
     FOREIGN KEY ([fk_topics_topicId]) REFERENCES topics([topicId])
 );
@@ -115,14 +116,14 @@ CREATE TABLE [dbo].[documents] (
     [documentDescription] VARCHAR(256) NOT NULL,
     [documentLocation] VARCHAR(256) NOT NULL,
     [fk_documentTypes_documentTypeId] INT NOT NULL,
-    [fk_people_personId] INT NOT NULL,
+    [fk_users_userId] INT NOT NULL,
     [fk_projects_projectId] INT,
     [fk_shares_shareId] INT,
     [fk_topics_topicId] INT NULL,
     [documentStatus]  INT NOT NULL DEFAULT 1,
     PRIMARY KEY CLUSTERED ([documentId] ASC),
     FOREIGN KEY ([fk_documentTypes_documentTypeId]) REFERENCES documentTypes([documentTypeId]),
-    FOREIGN KEY ([fk_people_personId]) REFERENCES people([personId]),
+    FOREIGN KEY ([fk_users_userId]) REFERENCES users([userId]),
     FOREIGN KEY ([fk_projects_projectId]) REFERENCES projects([projectId]),
     FOREIGN KEY ([fk_shares_shareId]) REFERENCES shares([shareId]),
     FOREIGN KEY ([fk_topics_topicId]) REFERENCES topics([topicId])  
@@ -131,15 +132,14 @@ CREATE TABLE [dbo].[documents] (
 CREATE INDEX [idx_chats_chatTitle] ON [dbo].[chats] ([chatTitle]);
 CREATE INDEX [idx_documents_documentTitle] ON [dbo].[documents] ([documentTitle]);
 CREATE INDEX [idx_notifications_notificationTitle] ON [dbo].[notifications] ([notificationTitle]);
-CREATE INDEX [idx_peopleChats_fk_personId_chatId] ON [dbo].[peopleChats] ([fk_people_personId], [fk_chats_chatId]);
-CREATE INDEX [idx_peopleProjects_fk_personId_projectId] ON [dbo].[peopleProjects] ([fk_people_personId], [fk_projects_projectId]);
+CREATE INDEX [idx_usersChats_fk_userId_chatId] ON [dbo].[usersChats] ([fk_users_userId], [fk_chats_chatId]);
+CREATE INDEX [idx_usersProjects_fk_userId_projectId] ON [dbo].[usersProjects] ([fk_users_userId], [fk_projects_projectId]);
 
 CREATE INDEX [idx_projects_projectTitle] ON [dbo].[projects] ([projectTitle]);
 CREATE INDEX [idx_projects_projectKeywords] ON [dbo].[projects] ([projectKeywords]);
 CREATE INDEX [idx_topics_topicTitle] ON [dbo].[topics] ([topicTitle]);
 CREATE INDEX [idx_topics_topicKeywords] ON [dbo].[topics] ([topicKeywords]);
 
-CREATE INDEX [idx_shares_fk_personId_projectId_topicId] ON [dbo].[shares] ([fk_people_personId], [fk_projects_projectId], [fk_topics_topicId]);
+CREATE INDEX [idx_shares_fk_userId_projectId_topicId] ON [dbo].[shares] ([fk_users_userId], [fk_projects_projectId], [fk_topics_topicId]);
 
 CREATE INDEX [idx_topicsProjects_fk_projectsId_topicId] ON [dbo].[shares] ([fk_projects_projectId], [fk_topics_topicId]);
-
