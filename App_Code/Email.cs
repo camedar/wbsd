@@ -9,6 +9,7 @@ using System.Net.Mail;
 /// </summary>
 public class Email
 {
+
     private string from = "email";
     private string password = "password";
     private string to = null;

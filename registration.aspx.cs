@@ -7,6 +7,8 @@ using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Net.Mail;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 public partial class registration : System.Web.UI.Page
 {
@@ -14,54 +16,86 @@ public partial class registration : System.Web.UI.Page
     {
         if (IsPostBack)
         {
-            //SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString);
-            //conn.Open();
-            Hashtable cond = new Hashtable();
-            cond.Add("email",txt_email.Text);
-            Database db = new Database();            
-            int temp = db.countRows("users", cond);
-            if (temp == 1)
-            {
-                Response.Write("The email " + txt_email.Text + " is already in use");
-            }
+            string Password = txt_password.Text;
+            txt_password.Attributes.Add("value", Password);
+            string Password2 = txt_password2.Text;
+            txt_password2.Attributes.Add("value", Password2);
+
         }
     }
 
     protected void btn_submit_Click(object sender, EventArgs e)
     {
-        Hashtable cond = new Hashtable();
-        cond.Add("email", txt_email.Text);
-        Database db = new Database();
-        int temp = db.countRows("users", cond);
-        if (temp == 0)
+        if (Page.IsValid)
         {
+            DatabaseOperations db = new DatabaseOperations();
+            Security sc = new Security();
             Hashtable dataArr = new Hashtable();
-            string confirmationCode = db.generateRandomString();
-            string encodedPassword = db.encodePassword(txt_password.Text);
-            dataArr.Add("firstname", txt_firstname.Text);
-            dataArr.Add("surname", txt_surname.Text);
-            dataArr.Add("email", txt_email.Text);
+            string confirmationCode = sc.generateRandomNumber(6);
+            string encodedPassword = sc.encodePassword(txt_password.Text.Trim());
+            string firstname = txt_firstname.Text.Trim();
+            dataArr.Add("firstname", txt_firstname.Text.Trim());
+            dataArr.Add("surname", txt_surname.Text.Trim());
+            dataArr.Add("email", txt_email.Text.Trim());
             dataArr.Add("password", encodedPassword);
             dataArr.Add("confirmationCode", confirmationCode);
 
-            db.insertRow("users",dataArr);
-            string textMessage = "Hello " + txt_firstname.Text + ", welcome to our site, please confirm your account by clicking <b><a href='http://localhost:62589/confirmAccount.aspx?h=" + confirmationCode + "'>here</a></b>";
-            try
+            string[] resp = db.insertRow("users",dataArr);
+            if (resp[0] == "1")
             {
-                MailMessage message = new MailMessage("m.camilo@gmail.com", txt_email.Text, "Confirmation email", textMessage);
-                message.IsBodyHtml = true;
-
-                SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
-                client.EnableSsl = true;
-                client.Credentials = new System.Net.NetworkCredential("m.camilo@gmail.com", "L%OnCFAux1");
-                client.Send(message);
+                string textMessage = "Hello " + firstname + ", thank you for signing up in our site, your confirmation code is <b>" + confirmationCode + "</a></b>";
+                Email newEmail = new Email();
+                newEmail.send(txt_email.Text, "Confirmation email", textMessage);
+                Response.Redirect("confirmEmail.aspx");
             }
-            catch (Exception ex)
+            else
             {
+                Response.Write("The account couldn't be created");
+            }
             
-            }
+        }
+    }
+  
+    protected void vld_email_existence_ServerValidate(object source, ServerValidateEventArgs args)
+    {
+        Hashtable cond = new Hashtable();
+        cond.Add("email", txt_email.Text);
+        DatabaseOperations db = new DatabaseOperations();
+        int temp = db.countRows("users", cond);
+        if (temp > 0)
+        {
+            args.IsValid = false;
+        }
+        else
+        {
+            args.IsValid = true;
         }
     }
 
+    /*protected void upd_captcha_DataBinding(object sender, EventArgs e)
+    {
+        Security sc = new Security();
 
+        Font f = new Font("Forte", 20, FontStyle.Italic);
+        // image width and height
+        Bitmap b = new Bitmap(150, 50);
+        Graphics g = Graphics.FromImage(b);
+
+        // setting background color
+        g.Clear(Color.Yellow);
+
+        String CaptchaString = sc.generateRandomString(6);
+
+        g.DrawString(CaptchaString, f, Brushes.Red, 10, 10);
+
+        Response.ContentType = "image/GIF";
+        b.Save(Response.OutputStream, ImageFormat.Gif);
+        Response.Write(DateTime.Now.ToString());
+
+        
+        
+        f.Dispose();
+        b.Dispose();
+        g.Dispose();
+    }*/
 }
