@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Activities.Expressions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -31,7 +32,7 @@ public class BasePage : System.Web.UI.Page
         }
     }
 
-    private bool isUserSignedIn()
+    protected bool isUserSignedIn()
     {
         if(Session["SessionManagement"] == null)
         {
@@ -48,13 +49,11 @@ public class BasePage : System.Web.UI.Page
         // get data that's common to all implementors of FactsheetBase 
         // and store the values in FactsheetBase's properties 
         //this.Data = ExtractPageData(Request.QueryString["data"]);
-        if(isUserSignedIn())
+        string path = HttpContext.Current.Request.Url.AbsolutePath;
+        path = path.Substring(path.LastIndexOf("/"));
+        if (!isUserSignedIn() && path != "/login.aspx")
         {
-            Response.Write("The user is signed on");
-        }
-        else
-        {
-            Response.Write("The user is not signed on");
+            Response.Redirect("login.aspx");
         }
     }
 
