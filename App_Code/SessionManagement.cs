@@ -59,4 +59,7 @@ public class SessionManagement
         }
         set { HttpContext.Current.Session["UserId"] = value; }
     }
+    public void signOut(){
+        HttpContext.Current.Session.Abandon();
+    }
 }

@@ -46,17 +46,40 @@ public partial class login : BasePage
         string encodedPassword = sc.encodePassword(txt_password.Text.Trim());
         cond.Add("email", txt_username.Text);
         cond.Add("password", encodedPassword);
+        //cond.Add("status", "1");
         DatabaseOperations db = new DatabaseOperations();
-        int temp = db.countRows("users", cond);
-        if (temp > 0)
+        //int temp = db.countRows("users", cond);
+ 
+
+        string[] fields = { "firstname", "status", "email" };
+        ArrayList queryData = db.selectRows("users", fields, cond);
+
+        if (queryData.Count > 0)
         {
-            args.IsValid = false;
+            args.IsValid = true;
+            Hashtable a = (Hashtable)queryData[0];
+            string status = (string)a["status"];
+            if (status == "0") {
+                string email = (string)a["email"];
+
+                Response.Cookies["UserInformationWBSD"]["NewEmail"] = email;
+                Response.Cookies["UserInformation"].Expires = DateTime.Now.AddHours(1);
+                Response.Redirect("confirmEmail.aspx");
+            }
         }
         else
         {
-            args.IsValid = true;
+            args.IsValid = false;
         }
     }
 
-    
+    protected void lnk_singup_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("signup.aspx");
+    }
+
+    protected void lnk_resetpassword_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("resetpassword.aspx");
+    }
 }

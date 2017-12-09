@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Data.SqlClient;
 using System.Collections;
+using System.Data;
 
 /// <summary>
 /// Summary description for DatabaseOperations
@@ -25,7 +26,7 @@ public class DatabaseOperations : Database
             cond = " WHERE ";
             foreach (string key in conditions.Keys)
             {
-                string val = (string)conditions[key];
+                string val = (string)conditions[key].ToString();
                 cond += key + " = '" + val + "' AND ";
             }
         }
@@ -52,7 +53,7 @@ public class DatabaseOperations : Database
             cond = " WHERE ";
             foreach (string key in conditions.Keys)
             {
-                string val = (string)conditions[key];
+                string val = (string)conditions[key].ToString();
                 cond += key + " = '" + val + "' AND ";
             }
         }
@@ -97,7 +98,7 @@ public class DatabaseOperations : Database
             cond = " WHERE ";
             foreach (string key in conditions.Keys)
             {
-                string val = (string)conditions[key];
+                string val = (string)conditions[key].ToString();
                 if (val.Contains("%"))
                 {
                     cond += key + " LIKE '" + val + "' AND ";
@@ -115,7 +116,7 @@ public class DatabaseOperations : Database
         {
             foreach (string key_ in columns.Keys)
             {
-                string val_ = (string)columns[key_];
+                string val_ = (string)columns[key_].ToString();
                 cols += key_ + " = '" + val_ + "',";
             }
         }
@@ -149,7 +150,7 @@ public class DatabaseOperations : Database
         {
             foreach (string key_ in columns.Keys)
             {
-                string val_ = (string)columns[key_];
+                string val_ = (string)columns[key_].ToString();
                 cols += key_ + ",";
                 vals += "'" + val_ + "',";
             }
@@ -177,7 +178,7 @@ public class DatabaseOperations : Database
         }
         catch (Exception ex)
         {
-            reponse[0] = "1";
+            reponse[0] = "0";
             reponse[1] = ex.Message.ToString();
             Console.Write(ex.Message.ToString());
             return reponse;
@@ -192,7 +193,7 @@ public class DatabaseOperations : Database
         {
             foreach (string key_ in columns.Keys)
             {
-                string val_ = (string)columns[key_];
+                string val_ = (string)columns[key_].ToString();
                 cols += key_ + ",";
                 vals += "'" + val_ + "',";
             }
@@ -251,4 +252,82 @@ public class DatabaseOperations : Database
         }
                           
     }
+
+    public ArrayList executeStoredProcedure(string spName, Hashtable conditions)
+    {
+        ArrayList valuesList = new ArrayList();
+
+        SqlConnection conn = openConnection();
+        SqlCommand com = executeQuery(spName, conn, false);
+        com.CommandType = CommandType.StoredProcedure;
+        if (conditions.Count > 0)
+        {
+            foreach (string key in conditions.Keys)
+            {
+                com.Parameters.Add("@" + key, SqlDbType.VarChar).Value = (string)conditions[key].ToString();
+            }
+        }        
+        
+
+        using (SqlDataReader dataReader = com.ExecuteReader())
+        {
+            int numberFields = dataReader.FieldCount;
+            while (dataReader.Read())
+            {
+                ArrayList data = new ArrayList();
+                for (int i = 0; i < numberFields; i++)
+                {
+                    string val = dataReader[i].ToString();
+                    data.Add(val);
+                }
+
+                valuesList.Add(data);
+            }
+        }
+        
+        closeConnection(conn);
+        return valuesList;
+    }
+
+    public bool verifyExistenceUsernameInDB(string username,string userId)
+    {
+        Hashtable param = new Hashtable();
+        if (userId != null)
+        {
+            param.Add("userId", userId);
+        }
+        param.Add("userName", username);
+        ArrayList resp = executeStoredProcedure("verifyExistenceUsername", param);
+        ArrayList item = (ArrayList)resp[0];
+        int i;
+        Int32.TryParse((string)item[0], out i);
+        if (i > 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool verifyExistenceEmailInDB(string email, string userId)
+    {
+        Hashtable param = new Hashtable();
+        if (userId != null)
+        {
+            param.Add("userId", userId);
+        }
+        param.Add("userEmail", email);
+        ArrayList resp = executeStoredProcedure("verifyExistenceEmail", param);
+        ArrayList item = (ArrayList)resp[0];
+        int i;
+        Int32.TryParse((string)item[0], out i);
+        if (i > 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+
 }

@@ -9,6 +9,7 @@ public partial class home : BasePage
 {
     protected void Page_Load(object sender, EventArgs e)
     {
+        Response.Write("it comes from this page " + Request.Headers["Referer"]);
         Response.Write("Welcome " + this.SessionManagement.UserFirstname + " " + this.SessionManagement.UserSurname);
     }
 }

@@ -51,10 +51,18 @@ public class BasePage : System.Web.UI.Page
         //this.Data = ExtractPageData(Request.QueryString["data"]);
         string path = HttpContext.Current.Request.Url.AbsolutePath;
         path = path.Substring(path.LastIndexOf("/"));
-        if (!isUserSignedIn() && path != "/login.aspx")
+        //if (!isUserSignedIn() && path != "/login.aspx")        
+        if (!isUserSignedIn() && !path.StartsWith("/login.aspx") && !path.StartsWith("/confirmEmail.aspx") 
+            && !path.StartsWith("/logout.aspx") && !path.StartsWith("/signup.aspx"))
         {
             Response.Redirect("login.aspx");
         }
+    }
+
+    protected void logOut()
+    {
+        SessionManagement sm = new SessionManagement();
+        sm.signOut();
     }
 
 }

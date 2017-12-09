@@ -17,9 +17,11 @@
                     <asp:TextBox ID="txt_password" type="password" class="form-control"  aria-describedby="passwordHelp" runat="server" TextMode="Password"></asp:TextBox>
                     <asp:RequiredFieldValidator ID="vld_password" runat="server" ErrorMessage="A password is necesary to access your account" ControlToValidate="txt_password" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
                     <asp:RegularExpressionValidator ID="vld_regex_password" runat="server" ErrorMessage="This field contains characteres not permited" ForeColor="Red" Display="Dynamic" ControlToValidate="txt_password" ValidationExpression="[^'`\s]+"></asp:RegularExpressionValidator>
-                    <asp:CustomValidator ID="vld_login_credentials" runat="server" ErrorMessage="The username or password aren't correct" ForeColor="Red" Display="Dynamic" ControlToValidate="txt_password" OnServerValidate="vld_login_credentials_ServerValidate"></asp:CustomValidator>
+                    <asp:CustomValidator ID="vld_login_credentials" runat="server" ErrorMessage="The username or password are incorrect" ForeColor="Red" Display="Dynamic" ControlToValidate="txt_password" OnServerValidate="vld_login_credentials_ServerValidate"></asp:CustomValidator>
                 </div>
                 <asp:Button ID="btn_submit" runat="server" Text="Sign in" class="btn btn-primary" OnClick="btn_submit_Click" />
+
+            <asp:LinkButton ID="lnk_singup" runat="server" CausesValidation="False" OnClick="lnk_singup_Click">Sign up</asp:LinkButton> | <asp:LinkButton ID="lnk_resetpassword" runat="server" CausesValidation="False" OnClick="lnk_resetpassword_Click">Forgot password?</asp:LinkButton>
         </div>        
     </p>
 </asp:Content>
