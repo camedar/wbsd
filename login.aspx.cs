@@ -80,6 +80,6 @@ public partial class login : BasePage
 
     protected void lnk_resetpassword_Click(object sender, EventArgs e)
     {
-        Response.Redirect("resetpassword.aspx");
+        Response.Redirect("sendPassword.aspx");
     }
 }

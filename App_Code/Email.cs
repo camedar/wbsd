@@ -10,8 +10,8 @@ using System.Net.Mail;
 public class Email
 {
 
-    private string from = "email";
-    private string password = "password";
+    private string from = "m.camilo@gmail.com";
+    private string password = "L%OnCFAux1";
     private string to = null;
     private string smtp = "smtp.gmail.com";
     private int port = 587;

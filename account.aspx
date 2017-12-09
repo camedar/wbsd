@@ -27,6 +27,7 @@
                             <div class="form-group">
                                 <label for="txt_firstname">Firstname:</label>
                                 <asp:TextBox ID="txt_firstname" runat="server" Text='<%# Bind("firstname") %>' class="form-control" aria-describedby="txt_firstnameHelp" ValidationGroup="grp_profile" />
+                                <asp:RequiredFieldValidator ID="vld_required_txt_firstname" runat="server" ErrorMessage="A firstname is required" ValidationGroup="grp_profile" ControlToValidate="txt_firstname" EnableTheming="True" ForeColor="Red"></asp:RequiredFieldValidator>
                             </div>
                             <div class="form-group">
                                 <label for="txt_surname">Surname:</label>

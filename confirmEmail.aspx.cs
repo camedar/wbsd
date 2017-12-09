@@ -38,7 +38,6 @@ public partial class confirmAccount : BasePage
                 }
                 
                 refererPath = refererPath.Substring(refererPath.LastIndexOf("/"));
-                Response.Write("values refererpath=" + refererPath + "; current_email="+currentEmail + ";new_email=" + newEmail);
                 if (refererPath.StartsWith("/account.aspx") || refererPath.StartsWith("/login.aspx")
                     || refererPath.StartsWith("/signup.aspx"))
                 {

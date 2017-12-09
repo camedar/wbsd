@@ -12,7 +12,12 @@ public partial class account : BasePage
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-        showSectionAccount(0);
+        string refererPath = Request.Headers["Referer"];
+
+        if (!IsPostBack)
+        {
+            showSectionAccount(0);
+        }
     }
 
     protected void showSectionAccount(int idSection)
